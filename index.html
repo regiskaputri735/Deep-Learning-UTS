@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SmokeMap Indonesia 2025 · K-Means Clustering</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"><\/script>')</script>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav-in">
+    <a href="#top" class="brand"><span class="logo">◔</span><span><b>SmokeMap</b><small>K-Means Clustering</small></span></a>
+    <ul class="menu" id="menu">
+      <li><a href="#ringkasan" class="lk on">Ringkasan</a></li>
+      <li><a href="#klaster" class="lk">Klaster</a></li>
+      <li><a href="#grafik" class="lk">Grafik</a></li>
+      <li><a href="#data" class="lk">Data Provinsi</a></li>
+    </ul>
+    <div class="nav-r">
+      <button class="icon-btn" id="th" aria-label="Ganti tema">🌙</button>
+      <button class="icon-btn burger" id="bg" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-in">
+    <span class="eyebrow">DATA MINING · BPS 2025</span>
+    <h1>Pengelompokan Provinsi Berdasarkan Persentase Penduduk Usia 15+ yang Merokok</h1>
+    <p>38 provinsi di Indonesia dikelompokkan dengan algoritma K-Means ke dalam tiga tingkat: <b>Klaster 0 (Rendah)</b>, <b>Klaster 1 (Sedang)</b>, dan <b>Klaster 2 (Tinggi)</b>, berdasarkan enam kelompok umur.</p>
+    <div class="chips-hero">
+      <span>Silhouette <b>0,3317</b></span><span>Davies-Bouldin <b>0,9576</b></span><span>WCSS <b>77,96</b></span><span>k-means++ · n_init 10</span>
+    </div>
+    <div class="cta">
+      <a href="#klaster" class="btn pri">Lihat Klaster</a>
+      <a href="#data" class="btn">Data Provinsi</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="ringkasan" class="rv"><div class="grid g4" id="metrics"></div></section>
+
+  <section id="klaster" class="rv">
+    <h2>Pilih Klaster</h2>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-c="-1">Semua (38)</button>
+      <button class="tab" data-c="0">Klaster 0 · Rendah</button>
+      <button class="tab" data-c="1">Klaster 1 · Sedang</button>
+      <button class="tab" data-c="2">Klaster 2 · Tinggi</button>
+    </div>
+    <div class="grid g3" id="cards"></div>
+  </section>
+
+  <section id="grafik" class="rv">
+    <h2>Grafik Hasil</h2>
+    <div class="grid g2">
+      <div class="card"><b>Persentase Provinsi per Klaster</b><div class="ch"><canvas id="c1"></canvas></div></div>
+      <div class="card"><b>Profil Perokok per Kelompok Umur (%)</b><div class="ch"><canvas id="c2"></canvas></div></div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <b id="c3t">Rata-rata % Perokok per Provinsi</b>
+      <span class="hint">Ketuk batang untuk detail provinsi</span>
+      <div class="ch" id="c3box"><canvas id="c3"></canvas></div>
+    </div>
+  </section>
+
+  <section id="data" class="rv">
+    <div class="row-between">
+      <h2>Data Seluruh Provinsi</h2>
+      <button class="btn" id="csv">⬇ Unduh CSV</button>
+    </div>
+    <div class="tools">
+      <input id="q" placeholder="🔍  Cari provinsi…">
+      <select id="sortsel" aria-label="Urutkan">
+        <option value="idx-1">Urut: Nomor</option>
+        <option value="n-1">Urut: Nama A–Z</option>
+        <option value="m--1">Rata-rata tertinggi</option>
+        <option value="m-1">Rata-rata terendah</option>
+      </select>
+    </div>
+    <div class="tw"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+    <p class="note">Nilai dalam persen (%). “Rata-rata” = rata-rata enam kelompok umur. Klik judul kolom untuk mengurutkan, klik baris untuk melihat detail provinsi. Baris “Indonesia” adalah angka nasional dari data BPS.</p>
+  </section>
+</main>
+
+<footer>SmokeMap Indonesia · K-Means (k=3, k-means++, n_init=10, random_state=42, StandardScaler) · Data: BPS 2025</footer>
+<button class="totop" id="totop" aria-label="Kembali ke atas">↑</button>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <button class="x" id="mx" aria-label="Tutup">×</button>
+    <div id="mhead"></div>
+    <div class="ch" style="height:250px"><canvas id="cm"></canvas></div>
+    <div id="mbody"></div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
