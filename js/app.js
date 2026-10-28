@@ -35,7 +35,8 @@ const f2  = x => x.toFixed(2).replace('.', ',');
 const $   = id => document.getElementById(id);
 const rows = D.map((r,i) => ({idx:i, n:r[0], v:r.slice(1,7), c:r[7], m:avg(r.slice(1,7))}));
 const of   = c => rows.filter(r => r.c === c);
-const prof = c => AGES.map((_,i) => avg(of(c).map(r => r.v[i])));
+const prof = c => AGES.map((_,i) => avg(of(c).map(r => r.v[i])));   // rata-rata per kelompok umur
+const cavg = c => avg(prof(c));                                      // rata-rata klaster (22,75 / 26,98 / 30,98)
 const mob  = () => innerWidth < 640;
 const css  = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
@@ -68,17 +69,42 @@ function renderCards(){
     const g = of(c), pct = g.length / 38 * 100;
     return `<div class="card cc ${sel >= 0 && sel !== c ? 'dim' : ''}" data-c="${c}" style="border-top-color:${COL[c]}">
       <h3>KLASTER ${c} · ${NAME[c].toUpperCase()}</h3>
-      <div class="big">${g.length} <small>provinsi</small></div>
-      <div><b>${f2(pct)}%</b> dari seluruh provinsi</div>
+      <div class="big" style="color:${COL[c]}">${f2(cavg(c))}%</div>
+      <div class="lbl">rata-rata penduduk yang merokok</div>
+      <div><b>${g.length} provinsi</b></div>
+      <div class="share">Porsi jumlah provinsi: <b>${f2(pct)}%</b> dari 38</div>
       <div class="meter"><div data-w="${pct}" style="background:${COL[c]}"></div></div>
-      <div>Rata-rata perokok: <b>${f2(avg(g.map(r => r.m)))}%</b></div>
       <div class="chips">${g.map(r => `<i>${r.n}</i>`).join('')}</div>
     </div>`;
   }).join('');
   setTimeout(() => document.querySelectorAll('.meter div').forEach(m => m.style.width = m.dataset.w + '%'), 60);
 }
 
+/* ============ TABEL RATA-RATA PER KLASTER ============ */
+function renderClusterTable(){
+  $('cthead').innerHTML = '<tr><th>Kategori</th>' + AGES.map(a => `<th>${a}</th>`).join('') + '<th>Rata-rata</th></tr>';
+  $('ctbody').innerHTML = [0,1,2].map(c =>
+    `<tr><td><span class="bd" style="background:${COL[c]}">${NAME[c]}</span></td>` +
+    prof(c).map(x => `<td>${f2(x)}</td>`).join('') +
+    `<td class="av">${f2(cavg(c))}</td></tr>`).join('');
+}
+
+/* ============ LEGENDA GRAFIK PROFIL (warna + nama + nilai rata-rata) ============ */
+function renderProfLegend(){
+  const items = [0,1,2].map(c => ({i:c, name:NAME[c], val:cavg(c), color:COL[c], dim:sel >= 0 && sel !== c, nat:false}));
+  items.push({i:3, name:'Indonesia', val:avg(NAT), color:'', dim:false, nat:true});
+  $('pleg').innerHTML = items.map(it => `<div class="pi ${it.nat ? 'nat' : ''} ${it.dim ? 'dim' : ''}" data-i="${it.i}">
+    <div class="t"><i class="sw" style="${it.nat ? '' : 'background:' + it.color}"></i><span>${it.name}</span></div>
+    <div class="v" style="${it.nat ? '' : 'color:' + it.color}">${f2(it.val)}%</div></div>`).join('');
+}
+
 /* ============ GRAFIK ============ */
+const valueLabels = {id:'vl', afterDatasetsDraw(c){
+  const {ctx} = c; ctx.save(); ctx.fillStyle = css('--tx'); ctx.font = 'bold 13px DM Sans'; ctx.textAlign = 'center';
+  c.getDatasetMeta(0).data.forEach((b,i) => ctx.fillText(f2(c.data.datasets[0].data[i]) + '%', b.x, b.y - 8));
+  ctx.restore();
+}};
+
 function renderCharts(){
   if(typeof Chart === 'undefined') return;
   Chart.defaults.color = css('--mu');
@@ -86,13 +112,23 @@ function renderCharts(){
   Chart.defaults.font.family = "'DM Sans',sans-serif";
   Chart.defaults.font.size = mob() ? 11 : 12;
 
+  // Rata-rata % perokok per klaster
+  mk('c4', {type:'bar', plugins:[valueLabels],
+    data:{labels:[0,1,2].map(c => `Klaster ${c} · ${NAME[c]}`),
+      datasets:[{data:[0,1,2].map(c => +cavg(c).toFixed(2)), backgroundColor:[0,1,2].map(c => COL[c]), borderRadius:8, maxBarThickness:90}]},
+    options:{maintainAspectRatio:false, layout:{padding:{top:24}}, plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:t => ` Rata-rata ${f2(t.raw)}% perokok`}}},
+      scales:{y:{beginAtZero:true, max:40, title:{display:!mob(), text:'% perokok'}}}}});
+
+  // Porsi jumlah provinsi
   mk('c1', {type:'doughnut',
     data:{labels:[0,1,2].map(c => `${NAME[c]} (${of(c).length})`),
       datasets:[{data:[0,1,2].map(c => of(c).length), backgroundColor:[0,1,2].map(c => COL[c]), borderWidth:0}]},
     options:{maintainAspectRatio:false, cutout:'58%',
       plugins:{legend:{position:'bottom'},
-        tooltip:{callbacks:{label:t => ` ${t.raw} provinsi (${f2(t.raw/38*100)}%)`}}}}});
+        tooltip:{callbacks:{label:t => ` ${t.raw} provinsi (${f2(t.raw/38*100)}% dari seluruh provinsi)`}}}}});
 
+  // Profil per kelompok umur (legenda dibuat manual di bawah grafik agar bisa menampilkan nilai)
   const ds = [0,1,2].map(c => ({
     label:NAME[c], data:prof(c).map(x => +x.toFixed(2)), borderColor:COL[c], backgroundColor:COL[c], tension:.3,
     borderWidth:(sel < 0 || sel === c) ? 3.5 : 1.2, pointRadius:(sel < 0 || sel === c) ? 4 : 2
@@ -100,8 +136,10 @@ function renderCharts(){
   ds.push({label:'Indonesia', data:NAT, borderColor:css('--mu'), borderDash:[5,5], borderWidth:1.5, pointRadius:0, tension:.3});
   mk('c2', {type:'line', data:{labels:AGES, datasets:ds},
     options:{maintainAspectRatio:false, interaction:{mode:'index', intersect:false},
-      plugins:{legend:{position:'bottom'}}, scales:{y:{title:{display:!mob(), text:'% perokok'}}}}});
+      plugins:{legend:{display:false}}, scales:{y:{title:{display:!mob(), text:'% perokok'}}}}});
+  renderProfLegend();
 
+  // Rata-rata tiap provinsi
   const d = cur().sort((a,b) => b.m - a.m), rh = mob() ? 26 : 22;
   $('c3t').textContent = 'Rata-rata % Perokok per Provinsi' + (sel >= 0 ? ' · Klaster ' + sel + ' ' + NAME[sel] : '');
   $('c3box').style.height = Math.max(160, d.length * rh + 60) + 'px';
@@ -115,7 +153,7 @@ function renderCharts(){
       scales:{y:{ticks:{autoSkip:false, font:{size:mob() ? 10 : 12}}}}}});
 }
 
-/* ============ TABEL ============ */
+/* ============ TABEL PROVINSI ============ */
 const COLS = [['idx','No'], ['n','Provinsi'], ['c','Klaster'], ...AGES.map((a,i) => [String(i), a + ' th']), ['m','Rata-rata']];
 const val = (r,k) => /^\d$/.test(k) ? r.v[+k] : r[k];
 
@@ -141,7 +179,7 @@ function renderTable(){
 
 function render(){
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', +t.dataset.c === sel));
-  renderCards(); renderCharts(); renderTable();
+  renderCards(); renderClusterTable(); renderCharts(); renderTable();
 }
 
 /* ============ MODAL DETAIL PROVINSI ============ */
@@ -149,7 +187,7 @@ function openModal(r){
   const g = of(r.c), cp = prof(r.c);
   $('mhead').innerHTML = `<div class="mt">${r.n}</div>
     <div class="mrow"><span class="bd" style="background:${COL[r.c]}">Klaster ${r.c} · ${NAME[r.c]}</span>
-    <span>Rata-rata <b style="color:var(--tx)">${f2(r.m)}%</b> · nasional ${f2(avg(NAT))}%</span></div>`;
+    <span>Rata-rata <b style="color:var(--tx)">${f2(r.m)}%</b> · klaster ${f2(cavg(r.c))}% · nasional ${f2(avg(NAT))}%</span></div>`;
   $('mbody').innerHTML = `<div class="dl">${r.v.map((x,i) => {
     const df = x - NAT[i];
     return `<div>${AGES[i]} th<b>${f2(x)}%</b><span class="${df > 0 ? 'up' : 'dn'}">${df > 0 ? '▲' : '▼'} ${f2(Math.abs(df))}</span></div>`;
@@ -173,6 +211,12 @@ $('tabs').addEventListener('click', e => {
 $('cards').addEventListener('click', e => {
   const c = e.target.closest('.cc'); if(!c) return;
   sel = (sel === +c.dataset.c) ? -1 : +c.dataset.c; render();
+});
+$('pleg').addEventListener('click', e => {           // klik legenda = tampil/sembunyikan garis
+  const it = e.target.closest('.pi'); if(!it || !ch.c2) return;
+  const i = +it.dataset.i, vis = ch.c2.isDatasetVisible(i);
+  ch.c2.setDatasetVisibility(i, !vis); ch.c2.update();
+  it.classList.toggle('off', vis);
 });
 $('q').addEventListener('input', e => { q = e.target.value; renderCharts(); renderTable(); });
 $('thead').addEventListener('click', e => {
