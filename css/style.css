@@ -17,7 +17,6 @@ a{color:inherit;text-decoration:none}
 .brand small{color:var(--mu);font-size:11px;letter-spacing:.5px}
 .menu{list-style:none;display:flex;gap:4px;padding:0}
 .lk{padding:8px 16px;border-radius:20px;font-size:14px;font-weight:500;color:var(--mu);transition:.25s;display:block}
-.lk:hover{color:var(--tx);background:var(--bd)}
 .lk.on{color:#fff;background:var(--ac)}
 :root[data-theme=dark] .lk.on{color:#12151b}
 .nav-r{display:flex;gap:8px}
@@ -64,14 +63,27 @@ h2{font-family:'DM Serif Display',serif;font-weight:400;font-size:clamp(23px,3vw
 .tab[data-c="0"].on{background:var(--c0);color:#fff}.tab[data-c="1"].on{background:var(--c1);color:#fff}.tab[data-c="2"].on{background:var(--c2);color:#fff}
 .cc{cursor:pointer;border-top:5px solid;transition:.3s}
 .cc.dim{opacity:.38;filter:grayscale(.5)}
-.cc h3{font-size:14px;color:var(--mu);font-weight:500;letter-spacing:.5px}
-.cc .big{font-size:38px;font-family:'DM Serif Display',serif;line-height:1.2}
-.cc .big small{font-size:15px;color:var(--mu);font-family:'DM Sans'}
-.meter{height:8px;background:var(--bd);border-radius:5px;margin:10px 0;overflow:hidden}
+.cc h3{font-size:13px;color:var(--mu);font-weight:500;letter-spacing:.8px}
+.cc .big{font-size:44px;font-family:'DM Serif Display',serif;line-height:1.15;margin-top:2px}
+.cc .lbl{color:var(--mu);font-size:13px;margin-bottom:10px}
+.cc .share{font-size:13px;color:var(--mu);margin-top:8px}
+.cc .share b{color:var(--tx)}
+.meter{height:8px;background:var(--bd);border-radius:5px;margin-top:6px;overflow:hidden}
 .meter div{height:100%;border-radius:5px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
 .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
 .chips i{font-style:normal;font-size:11px;background:var(--bg);border:1px solid var(--bd);padding:3px 9px;border-radius:10px}
 .ch{position:relative;height:300px;margin-top:10px}
+
+/* ===== LEGENDA GRAFIK PROFIL (dengan nilai rata-rata) ===== */
+.pleg{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 26px;margin-top:14px}
+.pi{display:flex;flex-direction:column;align-items:center;cursor:pointer;user-select:none;transition:opacity .25s}
+.pi .t{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mu)}
+.pi .sw{width:40px;height:14px;border-radius:3px;display:inline-block}
+.pi.nat .sw{background:var(--bd);border:1.5px dashed var(--mu)}
+.pi .v{font-family:'DM Serif Display',serif;font-size:22px;line-height:1.25;margin-top:2px}
+.pi.dim{opacity:.45}
+.pi.off{opacity:.3}
+.pi.off .t span{text-decoration:line-through}
 
 /* ===== TABEL ===== */
 .tools{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
@@ -80,12 +92,18 @@ input{flex:1;max-width:380px;min-width:0}
 input:focus,select:focus{outline:none;border-color:var(--ac);box-shadow:0 0 0 4px rgba(59,106,168,.15)}
 #sortsel{display:none}
 .tw{overflow-x:auto;border:1px solid var(--bd);border-radius:18px;background:var(--card);box-shadow:var(--sh);-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;width:100%;font-size:14px;min-width:900px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+#mainTable{min-width:900px}
+.ct{min-width:560px}
 th,td{padding:12px 14px;text-align:right;border-bottom:1px solid var(--bd);white-space:nowrap}
-th{cursor:pointer;color:var(--mu);font-weight:500;font-size:12px;-webkit-user-select: none; user-select:none;background:var(--card)}
-tbody tr{cursor:pointer;transition:background .15s}
-td:nth-child(1),th:nth-child(1){text-align:center}
-td:nth-child(2),th:nth-child(2),td:nth-child(3),th:nth-child(3){text-align:left}
+th{color:var(--mu);font-weight:500;font-size:12px;user-select:none;background:var(--card)}
+#mainTable th{cursor:pointer}
+#mainTable tbody tr{cursor:pointer;transition:background .15s}
+#mainTable td:nth-child(1),#mainTable th:nth-child(1){text-align:center}
+#mainTable td:nth-child(2),#mainTable th:nth-child(2),#mainTable td:nth-child(3),#mainTable th:nth-child(3){text-align:left}
+.ct td:first-child,.ct th:first-child{text-align:left}
+.ct tbody tr:last-child td{border-bottom:0}
+.ct td.av{font-weight:700}
 .bd{color:#fff;padding:3px 11px;border-radius:12px;font-size:12px;font-weight:700;display:inline-block}
 .bar{height:6px;border-radius:3px;background:var(--bd);margin-top:4px;min-width:80px}
 .bar div{height:100%;border-radius:3px}
@@ -94,7 +112,7 @@ tr.nat td{font-weight:700;background:var(--bg);cursor:default}
 footer{text-align:center;color:var(--mu);font-size:12px;padding:30px 24px;border-top:1px solid var(--bd)}
 
 /* ===== MODAL ===== */
-.modal{position:fixed;inset:0;background:rgba(10,14,22,.6);-webkit-backdrop-filter: blur(4px); backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal{position:fixed;inset:0;background:rgba(10,14,22,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
 .modal.on{display:flex;animation:fd .25s}
 .box{background:var(--card);border-radius:22px;padding:28px;max-width:640px;width:100%;max-height:90vh;overflow:auto;position:relative;animation:pop .3s}
 .x{position:absolute;right:14px;top:8px;border:0;background:none;font-size:32px;color:var(--mu);cursor:pointer;width:44px;height:44px}
@@ -104,8 +122,7 @@ footer{text-align:center;color:var(--mu);font-size:12px;padding:30px 24px;border
 .dl div{background:var(--bg);border-radius:12px;padding:10px;text-align:center;font-size:12px;color:var(--mu)}
 .dl b{display:block;font-size:17px;color:var(--tx)}
 .up{color:#d6453d!important}.dn{color:#2e9e6b!important}
-@keyframes fd{from{opacity:0}}@keyframes pop{from{transform:scale(.92);opacity:0}}
-@keyframes up{from{transform:translateY(100%)}}
+@keyframes fd{from{opacity:0}}@keyframes pop{from{transform:scale(.92);opacity:0}}@keyframes up{from{transform:translateY(100%)}}
 
 .totop{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom));width:46px;height:46px;border-radius:50%;border:0;background:var(--ac);color:#fff;font-size:20px;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(20px);transition:.3s;box-shadow:var(--sh);z-index:40}
 .totop.on{opacity:1;pointer-events:auto;transform:none}
@@ -116,11 +133,12 @@ footer{text-align:center;color:var(--mu);font-size:12px;padding:30px 24px;border
 .btn:hover{transform:translateY(-2px);box-shadow:var(--sh)}
 .icon-btn:hover{transform:rotate(20deg) scale(1.08)}
 .lk:hover{color:var(--tx);background:var(--bd)}
+.lk.on:hover{color:#fff;background:var(--ac)}
 .tab:hover{transform:translateY(-2px)}
 .cc:hover{transform:translateY(-6px)}
 .chips i:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
-th:hover{color:var(--tx)}
-tbody tr:hover{background:var(--bg)}
+#mainTable th:hover{color:var(--tx)}
+#mainTable tbody tr:hover{background:var(--bg)}
 }
 
 /* ===== TABLET (≤ 1023px) ===== */
@@ -147,6 +165,9 @@ tbody tr:hover{background:var(--bg)}
 section{padding-top:44px}
 .ch{height:260px}
 .hint{float:none;display:block;margin-top:2px}
+.pleg{gap:10px 16px}
+.pi .sw{width:30px}
+.pi .v{font-size:19px}
 
 .tabs{flex-wrap:nowrap;overflow-x:auto;margin-left:-16px;margin-right:-16px;padding:2px 16px 8px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -155,20 +176,19 @@ section{padding-top:44px}
 .tools input{max-width:none;flex:1 1 100%}
 #sortsel{display:block;flex:1 1 100%}
 
-/* tabel -> kartu */
-.tw{border:0;background:none;box-shadow:none;overflow:visible}
-table,tbody{display:block;min-width:0}
-thead{display:none}
-tbody tr{display:block;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:var(--sh)}
-tbody td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0;border:0;text-align:right!important;font-size:14px}
-tbody td::before{content:attr(data-label);color:var(--mu);font-size:12px;text-align:left}
-td:nth-child(1){display:none}
-td:nth-child(2){font-weight:700;font-size:17px;padding-bottom:2px}
-td:nth-child(2)::before{content:''}
-td.avg{display:block;padding-top:10px;margin-top:6px;border-top:1px solid var(--bd)}
-td.avg::before{display:block;margin-bottom:4px}
-tr.nat td:nth-child(2)::before{content:''}
-tr.nat{background:var(--bg)}
+/* tabel provinsi -> kartu */
+#data .tw{border:0;background:none;box-shadow:none;overflow:visible}
+#mainTable,#mainTable tbody{display:block;min-width:0}
+#mainTable thead{display:none}
+#mainTable tbody tr{display:block;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:var(--sh)}
+#mainTable tbody td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0;border:0;text-align:right!important;font-size:14px}
+#mainTable tbody td::before{content:attr(data-label);color:var(--mu);font-size:12px;text-align:left}
+#mainTable td:nth-child(1){display:none}
+#mainTable td:nth-child(2){font-weight:700;font-size:17px;padding-bottom:2px}
+#mainTable td:nth-child(2)::before{content:''}
+#mainTable td.avg{display:block;padding-top:10px;margin-top:6px;border-top:1px solid var(--bd)}
+#mainTable td.avg::before{display:block;margin-bottom:4px}
+#mainTable tr.nat{background:var(--bg)}
 
 /* modal -> bottom sheet */
 .modal{align-items:flex-end;padding:0}
